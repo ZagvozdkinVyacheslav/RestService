@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org%22%3E/">
+<head>
+    <title>Getting Started: Handling Form Submission</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+<h1>Здесь представлены все жители</h1>
+
+
+<tbody>
+<tr th:each="citizen : ${citizenList}">
+
+    <td><span th:text="${citizen.toString()}"></span></td>
+    <br/>
+
+</tr>
+</tbody>
+<form action="http://localhost:8080/citizens"  method="post">
+    <div>
+        <label>Input firstName</label>
+        <input type="text" name="first_name" placeholder="example">
+    </div>
+    <div>
+        <label>Input lastName</label>
+        <input type="text" name="last_name" placeholder="example">
+    </div>
+    <div>
+        <label>Input middleName</label>
+        <input type="text" name="middle_name" placeholder="example">
+    </div>
+    <div>
+        <label>Input dateBirth</label>
+        <input type="text" name="birth_date" placeholder="example">
+    </div>
+    <div>
+        <label>Input phone</label>
+        <input type="text" name="phone" placeholder="example">
+    </div>
+    <div>
+        <label>Input extra_phone</label>
+        <input type="text" name="extra_phone" placeholder="example">
+    </div>
+    <div>
+        <label>Input dul_serie</label>
+        <input type="text" name="dul_serie" placeholder="example">
+    </div>
+    <div>
+        <label>Input dul_number</label>
+        <input type="text" name="dul_number" placeholder="example">
+    </div>
+    <button >Сравнить</button>
+</form>
+</body>
+</html>

@@ -1,16 +1,16 @@
 package com.example.database.dto;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-@NoArgsConstructor
 
 @Getter
 @Setter
-
+@ToString
+@Component
 @Entity
 @Table(name = "citizens")
 public class Citizen {
@@ -25,11 +25,15 @@ public class Citizen {
     private String middle_name;
     @Column(name = "birth_date")
     private String birth_date;
+    @Column(name = "phone")
+    private String phone;
+    @Column(name = "extra_phone")
+    private String extra_phone;
+    @Column(name = "dul_serie")
+    private String dul_serie;
+    @Column(name = "dul_number")
+    private String dul_number;
 
-    public Citizen(String last_name, String first_name, String middle_name, String birth_date) {
-        this.last_name = last_name;
-        this.first_name = first_name;
-        this.middle_name = middle_name;
-        this.birth_date = birth_date;
+    public Citizen() {
     }
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CitizensRepo extends CrudRepository<Citizen, Long> {
+
 }
