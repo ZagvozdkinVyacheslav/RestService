@@ -20,8 +20,8 @@
   <input type="checkbox" name="birthDateBtn"/>
   <button>Отфильтровать</button>
 </form>
-<h2>Post запрос к :http://localhost:8080/citizens</h2>
-<h3>Введите ID для поиска пользователя</h3>
+<h2>Get запрос к :http://localhost:8080/citizens{id}</h2>
+<h3>(Пока не работает)Введите ID для поиска пользователя</h3>
 <form action="http://localhost:8080/citizens/"  method="get">
   <div>
     <label>Input id</label>
@@ -34,12 +34,12 @@
 <h3>Введите данные для добавления пользователя</h3>
 <form action="http://localhost:8080/citizens"  method="post">
   <div>
-    <label>Input firstName</label>
-    <input type="text" name="first_name" placeholder="example">
-  </div>
-  <div>
     <label>Input lastName</label>
     <input type="text" name="last_name" placeholder="example">
+  </div>
+  <div>
+    <label>Input firstName</label>
+    <input type="text" name="first_name" placeholder="example">
   </div>
   <div>
     <label>Input middleName</label>
@@ -47,25 +47,25 @@
   </div>
   <div>
     <label>Input dateBirth</label>
-    <input type="text" name="birth_date" placeholder="example">
+    <input type="date" name="birth_date" placeholder="example">
   </div>
   <div>
     <label>Input phone</label>
-    <input type="text" name="phone" placeholder="example">
+    <input type="tel" pattern="\+7\-[0-9]{3}\-[0-9]{3}\-[0-9]{2}\-[0-9]{2}" value="+7(___)___-__-__" name="phone" placeholder="example">
   </div>
   <div>
     <label>Input extra_phone</label>
-    <input type="text" name="extra_phone" placeholder="example">
+    <input type="tel" pattern="\+7\-[0-9]{3}\-[0-9]{3}\-[0-9]{2}\-[0-9]{2}" name="extra_phone" placeholder="example">
   </div>
   <div>
     <label>Input dul_serie</label>
-    <input type="text" name="dul_serie" placeholder="example">
+    <input type="number" name="dul_serie" placeholder="example">
   </div>
   <div>
     <label>Input dul_number</label>
-    <input type="text" name="dul_number" placeholder="example">
+    <input type="number" name="dul_number" placeholder="example">
   </div>
-  <button >Сравнить</button>
+  <button>Добавить</button>
 </form>
 
 

@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
 public class CitizenBuilder {
 //должны быть через autowired но он приходит как null, как лечить не знаю
@@ -39,11 +41,11 @@ public class CitizenBuilder {
         citizen.setExtra_phone(extraPhone);
         return this;
     }
-    public CitizenBuilder addDulSerie(String dulSerie){
+    public CitizenBuilder addDulSerie(Integer dulSerie){
         citizen.setDul_serie(dulSerie);
         return this;
     }
-    public CitizenBuilder addDulNumber(String dulNumber){
+    public CitizenBuilder addDulNumber(Integer dulNumber){
         citizen.setDul_number(dulNumber);
         return this;
     }

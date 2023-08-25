@@ -2,9 +2,9 @@ package com.example.database.dto;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 
 @Getter
@@ -30,9 +30,9 @@ public class Citizen {
     @Column(name = "extra_phone")
     private String extra_phone;
     @Column(name = "dul_serie")
-    private String dul_serie;
+    private Integer dul_serie;
     @Column(name = "dul_number")
-    private String dul_number;
+    private Integer dul_number;
 
     public Citizen() {
     }

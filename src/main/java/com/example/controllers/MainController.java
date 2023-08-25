@@ -4,12 +4,14 @@ import com.example.builders.CitizenBuilder;
 import com.example.database.dto.Citizen;
 import com.example.database.repository.CitizensRepo;
 import com.example.service.CitizenService;
+import jakarta.persistence.NonUniqueResultException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,13 +25,14 @@ public class MainController {
     public ModelAndView startPage() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index");
+        modelAndView.setStatus(HttpStatusCode.valueOf(200));
         return modelAndView;
     }
     @GetMapping(path = "/citizens")
     public ModelAndView getCitizensByParams(@RequestParam(required = false,defaultValue = "off") String lastNameBtn,
                                             @RequestParam(required = false,defaultValue = "off") String firstNameBtn,
                                             @RequestParam(required = false,defaultValue = "off") String middleNameBtn,
-                                            @RequestParam(required = false,defaultValue = "off") String birthDateBtn) {
+                                            @RequestParam(required = false,defaultValue = "off") Date birthDateBtn) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("all_citizens");
         List<Citizen> citizenList = citizenService.findAllCitizensByParams(lastNameBtn,firstNameBtn,middleNameBtn,birthDateBtn);
@@ -59,12 +62,39 @@ public class MainController {
         return modelAndView;
     }
     @PostMapping(path = "/citizens")
-    public void addNewCitizen(@RequestParam String first_name,@RequestParam String last_name,
-                              @RequestParam String middle_name,@RequestParam String birth_date,
-                              @RequestParam String phone,@RequestParam String extra_phone,
-                              @RequestParam String dul_serie,@RequestParam String dul_number) {
-        citizenService.addCitizenInRepository(first_name,last_name, middle_name, birth_date,
-                phone, extra_phone, dul_serie,dul_number);
+    public ModelAndView addNewCitizen(@RequestParam(required = false,defaultValue = "") String last_name,
+                              @RequestParam(required = false,defaultValue = "") String first_name,
+                              @RequestParam(required = false,defaultValue = "") String middle_name,
+                              @RequestParam(required = false,defaultValue = "") String birth_date,
+                              @RequestParam(required = false,defaultValue = "") String phone,
+                              @RequestParam(required = false,defaultValue = "") String extra_phone,
+                              @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
+                              @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
+        ModelAndView modelAndView = new ModelAndView();
+        try{
+            citizenService.addCitizenInRepository(last_name,first_name, middle_name, birth_date,
+                    phone, extra_phone, dul_serie,dul_number);
+            modelAndView.setViewName("success_add_citizen");
+            modelAndView.setStatus(HttpStatusCode.valueOf(201));
+        }catch (NullPointerException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }catch (NumberFormatException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }
+        catch (NonUniqueResultException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }
+
+
+
+
+        return modelAndView;
     }
     @PutMapping(path = "/citizens/{id}")
     public void modificationDataCitizen() {
