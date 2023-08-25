@@ -3,12 +3,14 @@ package com.example.service;
 import com.example.builders.CitizenBuilder;
 import com.example.database.dto.Citizen;
 import com.example.database.repository.CitizensRepo;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CitizenService {
@@ -29,7 +31,10 @@ public class CitizenService {
 
         citizensRepo.save(builder.build());
     }
-    public List<Citizen> findAllCitizens(){
+    public List<Citizen> findAllCitizensByParams(String lastName, String firstName, String middleName, String birthDate){
         return (List<Citizen>) citizensRepo.findAll();
+    }
+    public Citizen findCitizenById(Long id){
+        return citizensRepo.findById(id).get();
     }
 }
