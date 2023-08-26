@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,14 +30,31 @@ public class MainController {
         return modelAndView;
     }
     @GetMapping(path = "/citizens")
-    public ModelAndView getCitizensByParams(@RequestParam(required = false,defaultValue = "off") String lastNameBtn,
-                                            @RequestParam(required = false,defaultValue = "off") String firstNameBtn,
-                                            @RequestParam(required = false,defaultValue = "off") String middleNameBtn,
-                                            @RequestParam(required = false,defaultValue = "off") Date birthDateBtn) {
+    public ModelAndView getCitizensByParams(@RequestParam String lastNameBtn,
+                                            @RequestParam String firstNameBtn,
+                                            @RequestParam String middleNameBtn,
+                                            @RequestParam String birthDateBtn) {
+        if(lastNameBtn.equals(""))lastNameBtn = null;
+        if(firstNameBtn.equals(""))firstNameBtn = null;
+        if(middleNameBtn.equals(""))middleNameBtn = null;
+        if(birthDateBtn.equals(""))birthDateBtn = null;
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("all_citizens");
-        List<Citizen> citizenList = citizenService.findAllCitizensByParams(lastNameBtn,firstNameBtn,middleNameBtn,birthDateBtn);
-        modelAndView.addObject("citizenList", citizenList);
+        try {
+            List<Citizen> citizenList = citizenService.findListOfCitizensByOptionalParams(lastNameBtn,firstNameBtn,middleNameBtn,birthDateBtn);
+            modelAndView.setViewName("all_citizens");
+            modelAndView.setStatus(HttpStatusCode.valueOf(200));
+            modelAndView.addObject("citizenList", citizenList);
+        }catch (NoSuchElementException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(404));
+        }
+        catch (Exception e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
+            modelAndView.setStatus(HttpStatusCode.valueOf(500));
+        }
+        
         return modelAndView;
     }
     @GetMapping(path = "/citizens/{id}")//нет работы через html
@@ -74,7 +92,9 @@ public class MainController {
         try{
             citizenService.addCitizenInRepository(last_name,first_name, middle_name, birth_date,
                     phone, extra_phone, dul_serie,dul_number);
+            Long id = citizenService.findAllCitizensByParams(last_name,first_name,middle_name,birth_date).get(0).getId();
             modelAndView.setViewName("success_add_citizen");
+            modelAndView.addObject("citizen_id", "id гражданина = " + id.toString());
             modelAndView.setStatus(HttpStatusCode.valueOf(201));
         }catch (NullPointerException e){
             modelAndView.setViewName("some_exception");
@@ -90,9 +110,11 @@ public class MainController {
             modelAndView.addObject("someMessage", e.getMessage());
             modelAndView.setStatus(HttpStatusCode.valueOf(400));
         }
-
-
-
+        catch (DateTimeException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }
 
         return modelAndView;
     }

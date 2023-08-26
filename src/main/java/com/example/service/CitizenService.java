@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.DateTimeException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -57,7 +55,6 @@ public class CitizenService {
         if(citizensRepo.listCitizensByParam(last_name,first_name,middle_name,birth_date).size() >= 1)
             throw new NonUniqueResultException("Такой пользователь уже зарегестрирован");
         //checking date exceptions
-
         Date birthDateFormatDate = new Date(Integer.parseInt(birth_date.substring(0,4)),
                 Integer.parseInt(birth_date.substring(5,7)), Integer.parseInt(birth_date.substring(8,10)));
 
@@ -65,7 +62,9 @@ public class CitizenService {
 
         Date currentDate = new Date(Integer.parseInt(curentDateString.substring(0,4)),
                 Integer.parseInt(curentDateString.substring(4,6)),Integer.parseInt(curentDateString.substring(6,8)));
-        //TODO доделать дат сравнение
+        long diffInMillies = Math.abs(currentDate.getTime() - birthDateFormatDate.getTime());
+        long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        if(diff / 365 < 18) throw new DateTimeException("Нельзя сохранить жителя, которому меньше 18 лет");
         //checking many exceptions
 
 
@@ -82,11 +81,17 @@ public class CitizenService {
         if(!middle_name.equals(""))builder.addMiddleName(middle_name);
         //builder
         citizensRepo.save(builder.build());
+
     }
-    public List<Citizen> findAllCitizensByParams(String lastName, String firstName, String middleName, Date birthDate){
-        return (List<Citizen>) citizensRepo.findAll();
+    public List<Citizen> findAllCitizensByParams(String lastName, String firstName, String middleName, String birthDate){
+        return citizensRepo.listCitizensByParam(lastName,firstName,middleName,birthDate);
     }
     public Citizen findCitizenById(Long id){
         return citizensRepo.findById(id).get();
+    }
+    public List<Citizen>findListOfCitizensByOptionalParams(String lastName, String firstName, String middleName, String birthDate){
+        List<Citizen> lst = citizensRepo.findListOfCitizensByOptionalParams(lastName, firstName, middleName, birthDate);
+        if(lst.size() == 0) throw new NoSuchElementException("Граждан по данному запросу не обнаружено");
+        return lst;
     }
 }
