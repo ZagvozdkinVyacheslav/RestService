@@ -94,4 +94,7 @@ public class CitizenService {
         if(lst.size() == 0) throw new NoSuchElementException("Граждан по данному запросу не обнаружено");
         return lst;
     }
+        public void deleteCitizenById(Long id){
+        citizensRepo.deleteById(id);
+    }
 }

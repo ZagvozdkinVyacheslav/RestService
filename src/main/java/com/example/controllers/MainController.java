@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.exceptions.TemplateInputException;
 
 import java.time.DateTimeException;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class MainController {
             modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
             modelAndView.setStatus(HttpStatusCode.valueOf(500));
         }
-        
+
         return modelAndView;
     }
     @GetMapping(path = "/citizens/{id}")//нет работы через html
@@ -123,7 +124,23 @@ public class MainController {
 
     }
     @DeleteMapping (path = "/citizens/{id}")
-    public void deleteCitizen() {
+    public ModelAndView deleteCitizen(@PathVariable(value = "id") Long id) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            citizenService.deleteCitizenById(id);
+            modelAndView.setViewName("index");
+            modelAndView.setStatus(HttpStatusCode.valueOf(200));
+        }catch (TemplateInputException e){//если такого нет
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", "В базе данных нет гражданина с таким id");
+            modelAndView.setStatus(HttpStatusCode.valueOf(404));
+        }catch (Exception e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
+            modelAndView.setStatus(HttpStatusCode.valueOf(500));
+        }
+
+        return modelAndView;
 
     }
 }

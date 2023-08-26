@@ -22,13 +22,12 @@
 </form>
 <h2>Get запрос к :http://localhost:8080/citizens{id}</h2>
 <h3>(Пока не работает)Введите ID для поиска пользователя</h3>
-<form action="http://localhost:8080/citizens/"  method="get">
+<form th:method="GET" th:action="@{/citizens/{id}(id = ${id}})"  >
   <div>
     <label>Input id</label>
     <input type="text" name="id" placeholder="example">
   </div>
-
-  <button >Сравнить</button>
+  <button>Показать</button>
 </form>
 <h2>Post запрос к :http://localhost:8080/citizens</h2>
 <h3>Введите данные для добавления пользователя</h3>
