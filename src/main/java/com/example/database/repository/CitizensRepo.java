@@ -1,10 +1,13 @@
 package com.example.database.repository;
 
 import com.example.database.dto.Citizen;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -28,4 +31,10 @@ public interface CitizensRepo extends JpaRepository<Citizen, Long> {
                                                      @Param("middle_name")String middleName,
                                                      @Param("birth_date")String birthDate
     );
+
+    @Modifying
+    @Transactional
+    //@Query(value = "UPDATE Citizen AS c SET c.last_name = :last_name WHERE c.id = :id")
+    @Query("UPDATE Citizen c SET  c.last_name = ?2 where c.id = ?1")
+    int updateCitizenLastNameById(Long id,String lastName);
 }
