@@ -6,7 +6,9 @@ import com.example.database.repository.CitizensRepo;
 import com.example.service.CitizenService;
 import jakarta.persistence.NonUniqueResultException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.exceptions.TemplateInputException;
@@ -120,7 +122,17 @@ public class MainController {
         return modelAndView;
     }
     @PutMapping(path = "/citizens/{id}")
-    public void modificationDataCitizen() {
+    public void modificationDataCitizen(@PathVariable(value = "id") Long id,
+            @RequestParam(required = false,defaultValue = "") String last_name,
+                                        @RequestParam(required = false,defaultValue = "") String first_name,
+                                        @RequestParam(required = false,defaultValue = "") String middle_name,
+                                        @RequestParam(required = false,defaultValue = "") String birth_date,
+                                        @RequestParam(required = false,defaultValue = "") String phone,
+                                        @RequestParam(required = false,defaultValue = "") String extra_phone,
+                                        @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
+                                        @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
+        ModelAndView modelAndView= new ModelAndView();
+
 
     }
     @DeleteMapping (path = "/citizens/{id}")

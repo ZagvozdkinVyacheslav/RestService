@@ -39,6 +39,7 @@ public class CitizenService {
             sb.append(".");
             throw new NullPointerException("Не заполнены обязательные поля:" + sb.toString());
         }
+
         //checking valid dul_serie and dul_number
         if(dul_serie.toString().length() != 4 || dul_number.toString().length() != 6){
             StringBuilder sb = new StringBuilder();
@@ -94,7 +95,22 @@ public class CitizenService {
         if(lst.size() == 0) throw new NoSuchElementException("Граждан по данному запросу не обнаружено");
         return lst;
     }
-        public void deleteCitizenById(Long id){
+    public void deleteCitizenById(Long id){
         citizensRepo.deleteById(id);
     }
+    public void modificateFields(Long id,String last_name, String first_name, String middle_name, String birth_date,
+                                 String phone, String extra_phone, Integer dul_serie, Integer dul_number){
+       /* List<String>citizenMainParams = new LinkedList<>();
+        for (int i = 0; i < 4; i++) {
+            citizenMainParams.add("");
+        }
+        if(!last_name.equals("")) citizenMainParams
+
+        if(first_name.equals("")) sb.append(" first_name,");
+        if(birth_date.equals("")) sb.append(" birth_date,");
+        if(phone.equals("")) sb.append(" phone,");
+        if(dul_serie.equals(1)) sb.append(" dul_serie,");
+        if(dul_number.equals(1)) sb.append(" dul_number,");*/
+    }
+
 }
