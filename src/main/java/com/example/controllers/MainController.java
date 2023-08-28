@@ -131,7 +131,14 @@ public class MainController {
                                         @RequestParam(required = false,defaultValue = "") String extra_phone,
                                         @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
                                         @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
-        citizenService.modificateFields(id,last_name,first_name,middle_name,birth_date,phone,extra_phone,dul_serie,dul_number);
+        ModelAndView modelAndView = new ModelAndView();
+        try{
+            
+            citizenService.modificateFields(id,last_name,first_name,middle_name,birth_date,phone,extra_phone,dul_serie,dul_number);
+        }catch ()
+
+
+
 
 
     }

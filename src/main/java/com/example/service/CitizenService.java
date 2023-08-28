@@ -92,7 +92,50 @@ public class CitizenService {
     }
     public void modificateFields(Long id,String last_name, String first_name, String middle_name, String birth_date,
                                  String phone, String extra_phone, Integer dul_serie, Integer dul_number){
-        citizensRepo.updateCitizenLastNameById(653l,"slava");
+        //если из основных 4 полей хотя бы одно не пустое
+        try {
+        if (!(last_name.equals("") &&first_name.equals("") &&middle_name.equals("") &&birth_date.equals("")))
+        {
+            Citizen citizen =  citizensRepo.findById(id).get();//throw no suchElemExc
+            var mainFieldsList = filtersService.mainFieldsFilterList(last_name,first_name,middle_name,birth_date);
+            if(mainFieldsList.get(0).equals(""))mainFieldsList.set(0,citizen.getLast_name());
+            if(mainFieldsList.get(1).equals(""))mainFieldsList.set(1,citizen.getFirst_name());
+            if(mainFieldsList.get(2).equals(""))mainFieldsList.set(2,citizen.getMiddle_name());
+            if(mainFieldsList.get(3).equals(""))mainFieldsList.set(3,citizen.getBirth_date());
+            if(citizensRepo.findListOfCitizensByOptionalParams(mainFieldsList.get(0),mainFieldsList.get(1),
+                    mainFieldsList.get(2),mainFieldsList.get(3)).size() > 1)throw new NonUniqueResultException("Такой гражданин уже существует.");
+            if(!mainFieldsList.get(0).equals(""))citizensRepo.updateCitizenLastNameById(id,last_name);
+            if(!mainFieldsList.get(1).equals(""))citizensRepo.updateCitizenFirstNameById(id,first_name);
+            if(!mainFieldsList.get(2).equals("")) citizensRepo.updateCitizenMiddleNameById(id,middle_name);
+            if(!mainFieldsList.get(3).equals(""))citizensRepo.updateCitizenBirthDateById(id,birth_date);
+
+        }
+
+        if(!phone.equals("")){//check phone
+            filtersService.checkValidPhone(phone);//throw NumberFormatExc
+            citizensRepo.updateCitizenPhoneById(id,phone);
+        }
+        if(!extra_phone.equals("")){//check extra_phone
+            filtersService.checkValidPhone(extra_phone);//throw NumberFormatExc
+            citizensRepo.updateCitizenExtraPhoneById(id,extra_phone);
+        }
+        if(!dul_serie.equals(1) && dul_serie.toString().length() == 4)//check dulSerie
+            citizensRepo.updateCitizenDulSerieById(id,dul_serie);
+        else throw new NumberFormatException("Поле dul_serie должно быть из 4 цифр");
+
+        if(!dul_number.equals(1) && dul_number.toString().length() == 6)//check dulNumber
+            citizensRepo.updateCitizenDulNumberById(id,dul_number);
+        else throw new NumberFormatException("Поле dul_number должно быть из 6 цифр");
+
+        }catch (NoSuchElementException e){
+            throw new NoSuchElementException("Гражданина с таким id не существует");
+        }catch (DateTimeException e){
+            throw new DateTimeException("Нельзя обновлять возраст гражданина так чтобы ему было меньше 18 лет");
+        }catch (NonUniqueResultException e){
+            throw new NonUniqueResultException(e.getMessage());
+        }catch (NumberFormatException e){
+            throw new NumberFormatException(e.getMessage());
+        }
 
     }
 
