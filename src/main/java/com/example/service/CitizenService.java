@@ -91,11 +91,15 @@ public class CitizenService {
         citizensRepo.deleteById(id);
     }
     public void modificateFields(Long id,String last_name, String first_name, String middle_name, String birth_date,
-                                 String phone, String extra_phone, Integer dul_serie, Integer dul_number){
+                                 String phone, String extra_phone, Integer dul_serie, Integer dul_number) throws NoSuchFieldException {
+        if(last_name.equals("")&&first_name.equals("")&&middle_name.equals("")&&birth_date.equals("")&&phone.equals("")
+                &&extra_phone.equals("")&&dul_serie.equals(1)&&dul_number.equals(1))
+            throw new NoSuchFieldException("Отправлен запрос без параметров для изменения");
         //если из основных 4 полей хотя бы одно не пустое
         try {
         if (!(last_name.equals("") &&first_name.equals("") &&middle_name.equals("") &&birth_date.equals("")))
         {
+
             Citizen citizen =  citizensRepo.findById(id).get();//throw no suchElemExc
             var mainFieldsList = filtersService.mainFieldsFilterList(last_name,first_name,middle_name,birth_date);
             if(mainFieldsList.get(0).equals(""))mainFieldsList.set(0,citizen.getLast_name());
@@ -121,11 +125,11 @@ public class CitizenService {
         }
         if(!dul_serie.equals(1) && dul_serie.toString().length() == 4)//check dulSerie
             citizensRepo.updateCitizenDulSerieById(id,dul_serie);
-        else throw new NumberFormatException("Поле dul_serie должно быть из 4 цифр");
+        else if(!dul_serie.equals(1)) throw new NumberFormatException("Поле dul_serie должно быть из 4 цифр");
 
         if(!dul_number.equals(1) && dul_number.toString().length() == 6)//check dulNumber
             citizensRepo.updateCitizenDulNumberById(id,dul_number);
-        else throw new NumberFormatException("Поле dul_number должно быть из 6 цифр");
+        else if(!dul_number.equals(1))throw new NumberFormatException("Поле dul_number должно быть из 6 цифр");
 
         }catch (NoSuchElementException e){
             throw new NoSuchElementException("Гражданина с таким id не существует");
