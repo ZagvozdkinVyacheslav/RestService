@@ -2,6 +2,14 @@ package com.example.controllers;
 
 import com.example.database.dto.Citizen;
 import com.example.service.CitizenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.NonUniqueResultException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -13,13 +21,14 @@ import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+@Tag(name = "Citizen", description = "The Citizen API")
 @RestController
 @RequestMapping(value = "/")
 public class MainController {
 
     @Autowired
     CitizenService citizenService;
+    @Operation(summary = "Start page", tags = "citizen")
     @GetMapping()
     public ModelAndView startPage() {
         ModelAndView modelAndView = new ModelAndView();
@@ -27,6 +36,17 @@ public class MainController {
         modelAndView.setStatus(HttpStatusCode.valueOf(200));
         return modelAndView;
     }
+    @Operation(summary = "Gets all citizens", tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found the users by Optional params",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = Citizen.class)))
+                    })
+    })
     @GetMapping(path = "/citizens")
     public ModelAndView getCitizensByParams(@RequestParam String lastNameBtn,
                                             @RequestParam String firstNameBtn,
@@ -55,6 +75,17 @@ public class MainController {
 
         return modelAndView;
     }
+    @Operation(summary = "Get one citizen", tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found user by id(@PathVariable)",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = Citizen.class)))
+                    })
+    })
     @GetMapping(path = "/citizens/{id}")//нет работы через html
     public ModelAndView getCitizen(@PathVariable(value = "id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
@@ -77,6 +108,16 @@ public class MainController {
         }
         return modelAndView;
     }
+    @Operation(summary = "Create new citizen", tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Create new citizen by params",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json")
+                    })
+    })
     @PostMapping(path = "/citizens")
     public ModelAndView addNewCitizen(@RequestParam(required = false,defaultValue = "") String last_name,
                               @RequestParam(required = false,defaultValue = "") String first_name,
@@ -116,6 +157,16 @@ public class MainController {
 
         return modelAndView;
     }
+    @Operation(summary = "Update one citizen", tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Update citizen by id and some params",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json")
+                    })
+    })
     @PutMapping(path = "/citizens/{id}")
     public ModelAndView modificationDataCitizen(@PathVariable(value = "id") Long id,
             @RequestParam(required = false,defaultValue = "") String last_name,
@@ -153,13 +204,19 @@ public class MainController {
             modelAndView.addObject("someMessage", e.getMessage());
             modelAndView.setStatus(HttpStatusCode.valueOf(400));
         }
-
-
-
-
-
         return modelAndView;
     }
+    @Operation(summary = "Delete citizen by id", tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Delete citizen by id",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json"
+                                    )
+                    })
+    })
     @DeleteMapping (path = "/citizens/{id}")
     public ModelAndView deleteCitizen(@PathVariable(value = "id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
@@ -176,8 +233,6 @@ public class MainController {
             modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
             modelAndView.setStatus(HttpStatusCode.valueOf(500));
         }
-
         return modelAndView;
-
     }
 }
