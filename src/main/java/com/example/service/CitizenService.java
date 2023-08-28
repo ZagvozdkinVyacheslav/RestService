@@ -20,21 +20,23 @@ import java.util.concurrent.TimeUnit;
 public class CitizenService {
     @Autowired
     CitizensRepo citizensRepo;
+    @Autowired
+    FiltersService filtersService;
     public CitizenService(){}
 
     //TODO раскидать по метадам чтоб не в одном все валялось
     public void addCitizenInRepository(String last_name, String first_name, String middle_name, String birth_date,
                                               String phone, String extra_phone, Integer dul_serie, Integer dul_number){
-        //checking many exceptions
+
         //checking empty field
         if(first_name.equals("")||last_name.equals("")|birth_date.equals("")||phone.equals("")||dul_serie.equals(1)||dul_number.equals(1)){
             StringBuilder sb = new StringBuilder();
-            if(last_name.equals("")) sb.append(" last_name,");
-            if(first_name.equals("")) sb.append(" first_name,");
-            if(birth_date.equals("")) sb.append(" birth_date,");
-            if(phone.equals("")) sb.append(" phone,");
-            if(dul_serie.equals(1)) sb.append(" dul_serie,");
-            if(dul_number.equals(1)) sb.append(" dul_number,");
+            sb.append(filtersService.lastNameFilter(last_name));
+            sb.append(filtersService.firstNameFilter(first_name));
+            sb.append(filtersService.birthDateFilter(birth_date));
+            sb.append(filtersService.phoneFilter(phone));
+            sb.append(filtersService.dulSerieFilter(dul_serie));
+            sb.append(filtersService.dulNumberFilter(dul_number));
             sb.deleteCharAt(sb.length() - 1);
             sb.append(".");
             throw new NullPointerException("Не заполнены обязательные поля:" + sb.toString());
@@ -43,30 +45,20 @@ public class CitizenService {
         //checking valid dul_serie and dul_number
         if(dul_serie.toString().length() != 4 || dul_number.toString().length() != 6){
             StringBuilder sb = new StringBuilder();
-            if(dul_serie.toString().length() != 4) sb.append(" dul_serie, должно быть 4 цифры,");
-            if(dul_number.toString().length() != 6) sb.append(" dul_number, должно быть 6 цифр,");
+            filtersService.checkAlgDulSerie(dul_serie);
+            filtersService.checkAlgDulNumber(dul_number);
             sb.deleteCharAt(sb.length() - 1);
             sb.append(".");
             throw new NumberFormatException("Неправильно заполнены поля:" + sb.toString());
         }
         //checking valid phone
-        if(!phone.matches("^((\\+7)[\\-]?)(\\(\\d{3}\\)[\\-]?)[\\d\\-]{9}$")){//+7(123)123-12-12
-            throw new NumberFormatException("Неправильный формат phone поля");
-        }
+        filtersService.checkValidPhone(phone);
+        //check ident user
         if(citizensRepo.listCitizensByParam(last_name,first_name,middle_name,birth_date).size() >= 1)
             throw new NonUniqueResultException("Такой пользователь уже зарегестрирован");
         //checking date exceptions
-        Date birthDateFormatDate = new Date(Integer.parseInt(birth_date.substring(0,4)),
-                Integer.parseInt(birth_date.substring(5,7)), Integer.parseInt(birth_date.substring(8,10)));
+        filtersService.check18Years(birth_date);
 
-        String curentDateString = new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance().getTime());
-
-        Date currentDate = new Date(Integer.parseInt(curentDateString.substring(0,4)),
-                Integer.parseInt(curentDateString.substring(4,6)),Integer.parseInt(curentDateString.substring(6,8)));
-        long diffInMillies = Math.abs(currentDate.getTime() - birthDateFormatDate.getTime());
-        long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        if(diff / 365 < 18) throw new DateTimeException("Нельзя сохранить жителя, которому меньше 18 лет");
-        //checking many exceptions
 
 
         //builder
@@ -99,18 +91,56 @@ public class CitizenService {
         citizensRepo.deleteById(id);
     }
     public void modificateFields(Long id,String last_name, String first_name, String middle_name, String birth_date,
-                                 String phone, String extra_phone, Integer dul_serie, Integer dul_number){
-       /* List<String>citizenMainParams = new LinkedList<>();
-        for (int i = 0; i < 4; i++) {
-            citizenMainParams.add("");
-        }
-        if(!last_name.equals("")) citizenMainParams
+                                 String phone, String extra_phone, Integer dul_serie, Integer dul_number) throws NoSuchFieldException {
+        if(last_name.equals("")&&first_name.equals("")&&middle_name.equals("")&&birth_date.equals("")&&phone.equals("")
+                &&extra_phone.equals("")&&dul_serie.equals(1)&&dul_number.equals(1))
+            throw new NoSuchFieldException("Отправлен запрос без параметров для изменения");
+        //если из основных 4 полей хотя бы одно не пустое
+        try {
+        if (!(last_name.equals("") &&first_name.equals("") &&middle_name.equals("") &&birth_date.equals("")))
+        {
 
-        if(first_name.equals("")) sb.append(" first_name,");
-        if(birth_date.equals("")) sb.append(" birth_date,");
-        if(phone.equals("")) sb.append(" phone,");
-        if(dul_serie.equals(1)) sb.append(" dul_serie,");
-        if(dul_number.equals(1)) sb.append(" dul_number,");*/
+            Citizen citizen =  citizensRepo.findById(id).get();//throw no suchElemExc
+            var mainFieldsList = filtersService.mainFieldsFilterList(last_name,first_name,middle_name,birth_date);
+            if(mainFieldsList.get(0).equals(""))mainFieldsList.set(0,citizen.getLast_name());
+            if(mainFieldsList.get(1).equals(""))mainFieldsList.set(1,citizen.getFirst_name());
+            if(mainFieldsList.get(2).equals(""))mainFieldsList.set(2,citizen.getMiddle_name());
+            if(mainFieldsList.get(3).equals(""))mainFieldsList.set(3,citizen.getBirth_date());
+            if(citizensRepo.findListOfCitizensByOptionalParams(mainFieldsList.get(0),mainFieldsList.get(1),
+                    mainFieldsList.get(2),mainFieldsList.get(3)).size() > 1)throw new NonUniqueResultException("Такой гражданин уже существует.");
+            if(!mainFieldsList.get(0).equals(""))citizensRepo.updateCitizenLastNameById(id,last_name);
+            if(!mainFieldsList.get(1).equals(""))citizensRepo.updateCitizenFirstNameById(id,first_name);
+            if(!mainFieldsList.get(2).equals("")) citizensRepo.updateCitizenMiddleNameById(id,middle_name);
+            if(!mainFieldsList.get(3).equals(""))citizensRepo.updateCitizenBirthDateById(id,birth_date);
+
+        }
+
+        if(!phone.equals("")){//check phone
+            filtersService.checkValidPhone(phone);//throw NumberFormatExc
+            citizensRepo.updateCitizenPhoneById(id,phone);
+        }
+        if(!extra_phone.equals("")){//check extra_phone
+            filtersService.checkValidPhone(extra_phone);//throw NumberFormatExc
+            citizensRepo.updateCitizenExtraPhoneById(id,extra_phone);
+        }
+        if(!dul_serie.equals(1) && dul_serie.toString().length() == 4)//check dulSerie
+            citizensRepo.updateCitizenDulSerieById(id,dul_serie);
+        else if(!dul_serie.equals(1)) throw new NumberFormatException("Поле dul_serie должно быть из 4 цифр");
+
+        if(!dul_number.equals(1) && dul_number.toString().length() == 6)//check dulNumber
+            citizensRepo.updateCitizenDulNumberById(id,dul_number);
+        else if(!dul_number.equals(1))throw new NumberFormatException("Поле dul_number должно быть из 6 цифр");
+
+        }catch (NoSuchElementException e){
+            throw new NoSuchElementException("Гражданина с таким id не существует");
+        }catch (DateTimeException e){
+            throw new DateTimeException("Нельзя обновлять возраст гражданина так чтобы ему было меньше 18 лет");
+        }catch (NonUniqueResultException e){
+            throw new NonUniqueResultException(e.getMessage());
+        }catch (NumberFormatException e){
+            throw new NumberFormatException(e.getMessage());
+        }
+
     }
 
 }

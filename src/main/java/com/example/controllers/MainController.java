@@ -1,21 +1,16 @@
 package com.example.controllers;
 
-import com.example.builders.CitizenBuilder;
 import com.example.database.dto.Citizen;
-import com.example.database.repository.CitizensRepo;
 import com.example.service.CitizenService;
 import jakarta.persistence.NonUniqueResultException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.thymeleaf.exceptions.TemplateInputException;
 
 import java.time.DateTimeException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -96,7 +91,7 @@ public class MainController {
             citizenService.addCitizenInRepository(last_name,first_name, middle_name, birth_date,
                     phone, extra_phone, dul_serie,dul_number);
             Long id = citizenService.findAllCitizensByParams(last_name,first_name,middle_name,birth_date).get(0).getId();
-            modelAndView.setViewName("success_add_citizen");
+            modelAndView.setViewName("success_request");
             modelAndView.addObject("citizen_id", "id гражданина = " + id.toString());
             modelAndView.setStatus(HttpStatusCode.valueOf(201));
         }catch (NullPointerException e){
@@ -122,7 +117,7 @@ public class MainController {
         return modelAndView;
     }
     @PutMapping(path = "/citizens/{id}")
-    public void modificationDataCitizen(@PathVariable(value = "id") Long id,
+    public ModelAndView modificationDataCitizen(@PathVariable(value = "id") Long id,
             @RequestParam(required = false,defaultValue = "") String last_name,
                                         @RequestParam(required = false,defaultValue = "") String first_name,
                                         @RequestParam(required = false,defaultValue = "") String middle_name,
@@ -131,9 +126,39 @@ public class MainController {
                                         @RequestParam(required = false,defaultValue = "") String extra_phone,
                                         @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
                                         @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
-        ModelAndView modelAndView= new ModelAndView();
+        ModelAndView modelAndView = new ModelAndView();
+        try{
+            citizenService.modificateFields(id,last_name,first_name,middle_name,birth_date,phone,extra_phone,dul_serie,dul_number);
+            modelAndView.setViewName("success_request");
+            modelAndView.addObject("citizen_id", "id гражданина = " + id.toString());
+            modelAndView.setStatus(HttpStatusCode.valueOf(200));
+        }catch (NoSuchElementException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(404));
+        }catch (DateTimeException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }catch (NonUniqueResultException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(500));
+        }catch (NumberFormatException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }catch (NoSuchFieldException e){
+            modelAndView.setViewName("some_exception");
+            modelAndView.addObject("someMessage", e.getMessage());
+            modelAndView.setStatus(HttpStatusCode.valueOf(400));
+        }
 
 
+
+
+
+        return modelAndView;
     }
     @DeleteMapping (path = "/citizens/{id}")
     public ModelAndView deleteCitizen(@PathVariable(value = "id") Long id) {
@@ -141,7 +166,7 @@ public class MainController {
         try {
             citizenService.deleteCitizenById(id);
             modelAndView.setViewName("index");
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
+            modelAndView.setStatus(HttpStatusCode.valueOf(204));
         }catch (TemplateInputException e){//если такого нет
             modelAndView.setViewName("some_exception");
             modelAndView.addObject("someMessage", "В базе данных нет гражданина с таким id");
