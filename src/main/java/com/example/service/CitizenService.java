@@ -3,14 +3,14 @@ package com.example.service;
 import com.example.database.entity.Citizen;
 import com.example.database.repository.CitizensRepo;
 
+import com.example.exception.NotFindException;
 import com.example.exception.UniqueException;
-import jakarta.validation.Valid;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
+import java.util.List;
 
 @Service
 @NoArgsConstructor
@@ -35,9 +35,16 @@ public class CitizenService {
                 .build();
         if(citizensRepo.findListOfCitizensByOptionalParams(citizen.getLast_name(),citizen.getFirst_name(),
                 citizen.getMiddle_name(), citizen.getBirth_date()).size() >= 1){
-            throw new UniqueException(ZonedDateTime.now());
+            throw new UniqueException();
         }
         return citizensRepo.save(citizen);
+    }
+    @SneakyThrows
+    public List getAllCitizensByParams(Citizen citizen){
+        var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLast_name(), citizen.getFirst_name(),
+                citizen.getMiddle_name(), citizen.getBirth_date());
+        if(citizenList.size() == 0)throw new NotFindException();
+        return citizenList;
     }
 
 }

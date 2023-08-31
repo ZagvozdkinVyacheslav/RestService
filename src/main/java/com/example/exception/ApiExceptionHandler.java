@@ -5,12 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.support.WebExchangeBindException;
 
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +25,10 @@ public class ApiExceptionHandler {
     }
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<Object> handleValidationConstraintViolationException(ConstraintViolationException ex) {
-
-
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler({UniqueException.class})
-    public ResponseEntity<Object> handleValidationExceptions(UniqueException ex) {
-        return new ResponseEntity<>(ex.getMessage() + "\n" + ex.getDateTime().toString(),ex.getHttpStatus());
+    @ExceptionHandler({UniqueException.class, NotFindException.class})//this classes implements MyExceptionInterface
+    public ResponseEntity<Object> handleValidationExceptions(MyExceptionInterface ex) {
+        return new ResponseEntity<>(ex.getMessageByExc(),ex.getHttpStatusByMyExc());
     }
 }

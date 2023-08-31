@@ -5,21 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
-import java.time.ZonedDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class UniqueException extends Throwable implements MyExceptionInterface{
-    private final String message = "Пользователь с введенными вами данными уже существует";
-    private final HttpStatus httpStatus = HttpStatus.valueOf(500);
+public class NotFindException extends Throwable implements MyExceptionInterface {
+
+    private final String message = "По данным параметрам пользователь не найден";
+    private final HttpStatus httpStatus = HttpStatus.valueOf(400);
     @Override
     public String getMessageByExc(){
         return message;
     }
-
     @Override
     public HttpStatus getHttpStatusByMyExc() {
         return httpStatus;
     }
+
 }

@@ -3,14 +3,23 @@ package com.example.controllers;
 import com.example.database.entity.Citizen;
 import com.example.interfaces.Marker;
 import com.example.service.CitizenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Citizen", description = "The Citizen API")
 @Validated
@@ -21,12 +30,8 @@ public class MainController {
     CitizenService citizenService;
     @Autowired
     Validator validator;
-    //@Operation(summary = "Start page", tags = "citizen")
-    @GetMapping()
-    public void startPage() {
 
-    }
-    /*@Operation(summary = "Gets all citizens", tags = "citizen")
+    @Operation(summary = "Gets all citizens", tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -38,34 +43,12 @@ public class MainController {
                     }),
             @ApiResponse(responseCode = "404",description = "The citizen was not found according to the specified parameters"),
             @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
-    })*/
-    /*@GetMapping(path = "/citizens")
-    public ModelAndView getCitizensByParams(@RequestParam String lastNameBtn,
-                                            @RequestParam String firstNameBtn,
-                                            @RequestParam String middleNameBtn,
-                                            @RequestParam String birthDateBtn) {
-        if(lastNameBtn.equals(""))lastNameBtn = null;
-        if(firstNameBtn.equals(""))firstNameBtn = null;
-        if(middleNameBtn.equals(""))middleNameBtn = null;
-        if(birthDateBtn.equals(""))birthDateBtn = null;
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            List<Citizen> citizenList = citizenService.findListOfCitizensByOptionalParams(lastNameBtn,firstNameBtn,middleNameBtn,birthDateBtn);
-
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
-            modelAndView.addObject("citizenList", citizenList);
-        }catch (NoSuchElementException e){
-
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }
-        catch (Exception e){
-
-            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }
-        return modelAndView;
-    }*/
+    })
+    @GetMapping(path = "/citizens")
+    public ResponseEntity<List> getCitizensByParams(@RequestBody @Validated(value = {Marker.onGetting.class}) @Valid Citizen citizen) {
+        var listOfCitizens = citizenService.getAllCitizensByParams(citizen);
+        return new ResponseEntity<>(listOfCitizens, HttpStatusCode.valueOf(200));
+    }
     /*@Operation(summary = "Get one citizen", tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
@@ -79,27 +62,10 @@ public class MainController {
             @ApiResponse(responseCode = "404",description = "The citizen was not found according to the id"),
             @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation"),
     })*/
-    /*@GetMapping(path = "/citizens/{id}")//нет работы через html
+    @GetMapping(path = "/citizens/{id}")//нет работы через html
     public ModelAndView getCitizen(@PathVariable(value = "id") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            Citizen citizen = citizenService.findCitizenById(id);
-            List<Citizen> citizenList = new ArrayList<>();
-            citizenList.add(citizen);
-            modelAndView.addObject("citizenList", citizenList);
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
-        }catch (NoSuchElementException e){
-
-            modelAndView.addObject("someMessage", "Такой элемент не найден!");
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }
-        catch (Exception e){
-
-            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }
-        return modelAndView;
-    }*/
+        
+    }
     /*@Operation(summary = "Create new citizen", tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
