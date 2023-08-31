@@ -3,6 +3,7 @@ package com.example.exception;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,5 +31,9 @@ public class ApiExceptionHandler {
     @ExceptionHandler({UniqueException.class, NotFindException.class})//this classes implements MyExceptionInterface
     public ResponseEntity<Object> handleValidationExceptions(MyExceptionInterface ex) {
         return new ResponseEntity<>(ex.getMessageByExc(),ex.getHttpStatusByMyExc());
+    }
+    @ExceptionHandler({HttpMessageNotReadableException.class})//Ошибка чтения тела запроса - 422 и сообщение об ошибке;
+    public ResponseEntity<Object> handleValidationExceptions(HttpMessageNotReadableException ex) {
+        return new ResponseEntity<>("Произошла ошибка чтения тела запроса.", HttpStatus.valueOf(422));
     }
 }

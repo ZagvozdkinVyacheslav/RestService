@@ -8,15 +8,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class Custom18YOValidator implements ConstraintValidator<Over18YO,String> {
-    private Over18YO over18YO;
-
+public class Custom18YONotNullValidator implements ConstraintValidator<Over18YONotNull,String> {
+    private Over18YONotNull over18YONotNull;
     @Override
-    public void initialize(Over18YO over18YO) {
-        ConstraintValidator.super.initialize(over18YO);
-        this.over18YO = over18YO;
+    public void initialize(Over18YONotNull over18YONotNull) {
+        ConstraintValidator.super.initialize(over18YONotNull);
+        this.over18YONotNull = over18YONotNull;
     }
-
     @Override
     public boolean isValid(String contactField, ConstraintValidatorContext constraintValidatorContext) {
         try {
@@ -34,7 +32,7 @@ public class Custom18YOValidator implements ConstraintValidator<Over18YO,String>
         }catch (StringIndexOutOfBoundsException e){
             return false;
         }catch (NullPointerException e){
-            return true;
+            return false;
         }
 
     }

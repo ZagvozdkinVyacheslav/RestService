@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public class NotFindException extends Throwable implements MyExceptionInterface {
 
-    private final String message = "По данным параметрам пользователь не найден";
+    private String message;
     private final HttpStatus httpStatus = HttpStatus.valueOf(400);
     @Override
     public String getMessageByExc(){

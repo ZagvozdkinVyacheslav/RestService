@@ -8,9 +8,16 @@ import com.example.exception.UniqueException;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @NoArgsConstructor
@@ -43,8 +50,46 @@ public class CitizenService {
     public List getAllCitizensByParams(Citizen citizen){
         var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLast_name(), citizen.getFirst_name(),
                 citizen.getMiddle_name(), citizen.getBirth_date());
-        if(citizenList.size() == 0)throw new NotFindException();
+        if(citizenList.size() == 0)throw new NotFindException("По данным параметрам гражданин не найден.");
         return citizenList;
     }
+    @SneakyThrows
+    public Citizen getOneCitizen(Long id){
+        try {
+            Citizen citizen = citizensRepo.findById(id).get();
+            return citizen;
+        }catch (NoSuchElementException e){
+            throw new NotFindException("По данному id гражданин не найден.");
+        }
+    }
+    public void updateCitizenByIdAndParams(Long id,Citizen citizen){
+        Citizen citizenForUpdate = citizensRepo.findById(id).get();
+        Field[] fields = citizen.getClass().getDeclaredFields();
+        ArrayList<Field> utilList = new ArrayList<Field>(Arrays.asList(fields));
+        List<StringBuilder> sbFields = new ArrayList<>();
+        List<String> fieldsOfCitizen = new ArrayList<>();
+        for (int i = 1; i < utilList.size();i++) {
+            sbFields.add(new StringBuilder(String.valueOf(utilList.get(i).getName())));
+            Character firstChar = sbFields.get(i - 1).charAt(0);
+            firstChar = (char) (firstChar & 0x5f);
+            sbFields.get(i - 1).setCharAt(0,firstChar);
+        }
+        try {
+            for (int i = 0; i < sbFields.size(); i++) {
+                //для гета сделать тоже самое но для ситизена
+                Method met = citizen.getClass().getMethod("set"+sbFields.get(0), String.class);
+                met.setAccessible(true);
+                met.invoke(citizenForUpdate,"df");
+            }
 
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 }

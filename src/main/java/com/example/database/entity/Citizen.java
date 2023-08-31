@@ -2,6 +2,7 @@ package com.example.database.entity;
 
 import com.example.interfaces.Marker;
 import com.example.validation.Over18YO;
+import com.example.validation.Over18YONotNull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -32,7 +33,8 @@ public class Citizen {
     @NotEmpty(message = "Citizen must have birth date", groups = Marker.onCreate.class)
     @Pattern(regexp = "[0-9]{4}.[0-9]{2}.[0-9]{2}",message = "Invalid date format")
     @Column(name = "birth_date")
-    @Over18YO(groups = {Marker.onCreate.class, Marker.onUpdate.class})
+    @Over18YONotNull(groups = {Marker.onCreate.class})
+    @Over18YO(groups = {Marker.onUpdate.class})
     private String birth_date;
     @NotNull(message = "Citizen must have phone", groups = Marker.onCreate.class)
     @NotEmpty(message = "Citizen must have phone", groups = Marker.onCreate.class)

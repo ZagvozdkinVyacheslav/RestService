@@ -19,6 +19,7 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Tag(name = "Citizen", description = "The Citizen API")
@@ -63,8 +64,8 @@ public class MainController {
             @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation"),
     })*/
     @GetMapping(path = "/citizens/{id}")//нет работы через html
-    public ModelAndView getCitizen(@PathVariable(value = "id") Long id) {
-        
+    public ResponseEntity<Citizen> getCitizen(@PathVariable(value = "id") Long id) {
+        return new ResponseEntity<>(citizenService.getOneCitizen(id),HttpStatusCode.valueOf(200));
     }
     /*@Operation(summary = "Create new citizen", tags = "citizen")
     @ApiResponses(value = {
@@ -80,9 +81,9 @@ public class MainController {
     })*/
 
     @PostMapping(path = "/citizens")
-    public ResponseEntity<String> addNewCitizen(@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
-        citizenService.saveCitizen(citizen);
-        return new ResponseEntity<>("Успех", HttpStatus.CREATED);
+    public ResponseEntity<Object> addNewCitizen(@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
+
+        return new ResponseEntity<>(citizenService.saveCitizen(citizen).getId(), HttpStatus.CREATED);
 
     }
     /*@Operation(summary = "Update one citizen", tags = "citizen")
@@ -98,44 +99,14 @@ public class MainController {
             @ApiResponse(responseCode = "404",description = "There is no such citizen"),
             @ApiResponse(responseCode = "500",description = "After changing the parameters, 2 identical citizens appear in the database"),
     })*/
-    /*@PutMapping(path = "/citizens/{id}")
-    public ModelAndView modificationDataCitizen(@PathVariable(value = "id") Long id,
-            @RequestParam(required = false,defaultValue = "") String last_name,
-                                        @RequestParam(required = false,defaultValue = "") String first_name,
-                                        @RequestParam(required = false,defaultValue = "") String middle_name,
-                                        @RequestParam(required = false,defaultValue = "") String birth_date,
-                                        @RequestParam(required = false,defaultValue = "") String phone,
-                                        @RequestParam(required = false,defaultValue = "") String extra_phone,
-                                        @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
-                                        @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
-        ModelAndView modelAndView = new ModelAndView();
-        try{
-            citizenService.modificateFields(id,last_name,first_name,middle_name,birth_date,phone,extra_phone,dul_serie,dul_number);
-            modelAndView.addObject("citizen_id", "id гражданина = " + id.toString());
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
-        }catch (NoSuchElementException e){
+    @PutMapping(path = "/citizens/{id}")
+    public ResponseEntity<Object> modificationDataCitizen(@PathVariable(value = "id") Long id,
+                                                           @RequestBody @Validated({Marker.onUpdate.class}) @Valid Citizen citizen) {
+        citizenService.updateCitizenByIdAndParams(id,citizen);
+        return new ResponseEntity<>("sf",HttpStatus.BAD_REQUEST);
 
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }catch (DateTimeException e){
 
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }catch (NonUniqueResultException e){
-
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }catch (NumberFormatException e){
-
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }catch (NoSuchFieldException e){
-
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }
-        return modelAndView;
-    }*/
+    }
     /*@Operation(summary = "Delete citizen by id", tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
