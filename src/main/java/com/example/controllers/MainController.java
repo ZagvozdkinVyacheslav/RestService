@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class MainController {
     @Autowired
     CitizenService citizenService;
+    @Autowired
+    Validator validator;
     //@Operation(summary = "Start page", tags = "citizen")
     @GetMapping()
     public void startPage() {

@@ -26,6 +26,12 @@ public class ApiExceptionHandler {
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<Object> handleValidationConstraintViolationException(ConstraintViolationException ex) {
+
+
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler({UniqueException.class})
     public ResponseEntity<Object> handleValidationExceptions(UniqueException ex) {
         return new ResponseEntity<>(ex.getMessage() + "\n" + ex.getDateTime().toString(),ex.getHttpStatus());
