@@ -3,18 +3,19 @@ package com.example.service;
 import com.example.database.entity.Citizen;
 import com.example.database.repository.CitizensRepo;
 
+import jakarta.validation.Valid;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-
+@NoArgsConstructor
 public class CitizenService {
     @Autowired
     CitizensRepo citizensRepo;
 
-    public CitizenService(){}
 
-    //TODO раскидать по метадам чтоб не в одном все валялось
+
     public Citizen saveCitizen(Citizen citizenIncome){
         Citizen citizen = Citizen.builder()
                 .last_name(citizenIncome.getLast_name())

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/")
 public class MainController {
-
     @Autowired
     CitizenService citizenService;
     //@Operation(summary = "Start page", tags = "citizen")
@@ -108,8 +107,10 @@ public class MainController {
             @ApiResponse(responseCode = "400",description = "Such a user was created earlier")
     })*/
     @PostMapping(path = "/citizens")
-    public ResponseEntity<Citizen> addNewCitizen(@RequestBody @Valid Citizen citizen) {
-        return new ResponseEntity<>(citizenService.saveCitizen(citizen), HttpStatus.CREATED);
+    public ResponseEntity<String> addNewCitizen(@RequestBody @Valid Citizen citizen) {
+        citizenService.saveCitizen(citizen);
+        return new ResponseEntity<>("Успех", HttpStatus.CREATED);
+
     }
     /*@Operation(summary = "Update one citizen", tags = "citizen")
     @ApiResponses(value = {

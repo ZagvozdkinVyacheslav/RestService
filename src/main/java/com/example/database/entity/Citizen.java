@@ -3,6 +3,7 @@ package com.example.database.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.validator.constraints.Range;
 
 
 @Getter
@@ -35,13 +36,12 @@ public class Citizen {
     @Pattern(regexp = "^((\\+7)[\\-]?)(\\(\\d{3}\\)[\\-]?)[\\d\\-]{9}$",message = "Invalid mobile number")
     @Column(name = "extra_phone")
     private String extra_phone;
-    //@NotBlank(message = "Citizen must have dul series")
-    @NotEmpty(message = "Citizen must have dul series")
-    @Size(min = 4)
+    @Min(value = 1000, message = "dul serie must have 4 digits")
+    @Max(value = 9999, message = "dul serie must have 4 digits")
     @Column(name = "dul_serie")
     private Integer dul_serie;
-    @Size(min = 6)
-    @NotBlank(message = "Citizen must have dul number")
+    @Min(value = 100000, message = "dul number must have 6 digits")
+    @Max(value = 999999, message = "dul number must have 6 digits")
     @Column(name = "dul_number")
     private Integer dul_number;
 
