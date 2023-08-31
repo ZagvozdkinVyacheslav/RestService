@@ -1,15 +1,18 @@
 package com.example.controllers;
 
 import com.example.database.entity.Citizen;
+import com.example.interfaces.Marker;
 import com.example.service.CitizenService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Citizen", description = "The Citizen API")
+@Validated
 @RestController
 @RequestMapping(value = "/")
 public class MainController {
@@ -106,8 +109,9 @@ public class MainController {
             @ApiResponse(responseCode = "400",description = "Required fields are not filled in + fields output"),
             @ApiResponse(responseCode = "400",description = "Such a user was created earlier")
     })*/
+
     @PostMapping(path = "/citizens")
-    public ResponseEntity<String> addNewCitizen(@RequestBody @Valid Citizen citizen) {
+    public ResponseEntity<String> addNewCitizen(@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
         citizenService.saveCitizen(citizen);
         return new ResponseEntity<>("Успех", HttpStatus.CREATED);
 
