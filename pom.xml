@@ -68,7 +68,6 @@
 			<artifactId>hibernate-validator</artifactId>
 			<version>7.0.0.Final</version>
 		</dependency>
-
 		<!--Swagger-->
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>

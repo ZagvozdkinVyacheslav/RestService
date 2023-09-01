@@ -13,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 @Entity
 @Table(name = "citizens")
 public class Citizen {
@@ -29,7 +30,6 @@ public class Citizen {
     private String first_name;
     @Column(name = "middle_name")
     private String middle_name;
-    @NotNull(message = "Citizen must have birth date", groups = Marker.onCreate.class)
     @NotEmpty(message = "Citizen must have birth date", groups = Marker.onCreate.class)
     @Pattern(regexp = "[0-9]{4}.[0-9]{2}.[0-9]{2}",message = "Invalid date format")
     @Column(name = "birth_date")
