@@ -116,22 +116,9 @@ public class MainController {
                                     )
                     })
     })*/
-   /* @DeleteMapping (path = "/citizens/{id}")
-    public ModelAndView deleteCitizen(@PathVariable(value = "id") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            citizenService.deleteCitizenById(id);
-
-            modelAndView.setStatus(HttpStatusCode.valueOf(204));
-        }catch (TemplateInputException e){//если такого нет
-
-            modelAndView.addObject("someMessage", "В базе данных нет гражданина с таким id");
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }catch (Exception e){
-
-            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }
-        return modelAndView;
-    }*/
+   @DeleteMapping (path = "/citizens/{id}")
+    public ResponseEntity<String> deleteCitizen(@PathVariable(value = "id") Long id) {
+        citizenService.deleteCitizenById(id);
+       return new ResponseEntity<>("",HttpStatus.valueOf(204));
+    }
 }

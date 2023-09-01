@@ -66,41 +66,49 @@ public class CitizenService {
     public void updateCitizenByIdAndParams(Long id, Citizen citizen){
         try {
             Citizen citizenForUpdate = citizensRepo.findById(id).get();
-
-
-        Field[] fields = citizen.getClass().getDeclaredFields();
-        ArrayList<Field> utilList = new ArrayList<Field>(Arrays.asList(fields));
-        List<StringBuilder> sbFields = new ArrayList<>();
-        for (int i = 1; i < utilList.size();i++) {
-            sbFields.add(new StringBuilder(String.valueOf(utilList.get(i).getName())));
-            Character firstChar = sbFields.get(i - 1).charAt(0);
-            firstChar = (char) (firstChar & 0x5f);
-            sbFields.get(i - 1).setCharAt(0,firstChar);
-        }
-        for (int i = 0; i < sbFields.size(); i++) {
-            Method metGet = citizen.getClass().getMethod("get"+sbFields.get(i));
-            metGet.setAccessible(true);
-            if(metGet.invoke(citizen) != null){
-                Method metSet;
-                if(i <= 5)//после 5 метода наш методы получают integer
-                {
-                    metSet = citizen.getClass().getMethod("set"+sbFields.get(i), String.class);
-                }
-                else {
-                    metSet = citizen.getClass().getMethod("set"+sbFields.get(i), Integer.class);
-                }
-                metSet.setAccessible(true);
-                metSet.invoke(citizenForUpdate,metGet.invoke(citizen));
+            Field[] fields = citizen.getClass().getDeclaredFields();
+            ArrayList<Field> utilList = new ArrayList<Field>(Arrays.asList(fields));
+            List<StringBuilder> sbFields = new ArrayList<>();
+            for (int i = 1; i < utilList.size();i++) {
+                sbFields.add(new StringBuilder(String.valueOf(utilList.get(i).getName())));
+                Character firstChar = sbFields.get(i - 1).charAt(0);
+                firstChar = (char) (firstChar & 0x5f);
+                sbFields.get(i - 1).setCharAt(0,firstChar);
             }
-        }
-        if(citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLast_name(), citizenForUpdate.getFirst_name(),
-                citizenForUpdate.getMiddle_name(),citizenForUpdate.getBirth_date()).size() > 1)
-            throw new UniqueException("По введенным данным уже существует гражданин");
-        else{
-            citizensRepo.save(citizenForUpdate);
-        }
+            for (int i = 0; i < sbFields.size(); i++) {
+                Method metGet = citizen.getClass().getMethod("get"+sbFields.get(i));
+                metGet.setAccessible(true);
+                if(metGet.invoke(citizen) != null){
+                    Method metSet;
+                    if(i <= 5)//после 5 метода наш методы получают integer
+                    {
+                        metSet = citizen.getClass().getMethod("set"+sbFields.get(i), String.class);
+                    }
+                    else {
+                        metSet = citizen.getClass().getMethod("set"+sbFields.get(i), Integer.class);
+                    }
+                    metSet.setAccessible(true);
+                    metSet.invoke(citizenForUpdate,metGet.invoke(citizen));
+                }
+            }
+            if(citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLast_name(), citizenForUpdate.getFirst_name(),
+                    citizenForUpdate.getMiddle_name(),citizenForUpdate.getBirth_date()).size() > 1)
+                throw new UniqueException("По введенным данным уже существует гражданин");
+            else{
+                citizensRepo.save(citizenForUpdate);
+            }
         }catch (NoSuchElementException e){
             throw new NotFindException("По данным параметрам гражданин не найден.");
         }
+    }
+    @SneakyThrows
+    public void deleteCitizenById(Long id){
+        try{
+            Citizen citizen = citizensRepo.findById(id).get();
+            citizensRepo.delete(citizen);
+        }catch (NoSuchElementException e){
+            throw new NotFindException("Гражданин не удален, тк в базе данных нет данного id");
+        }
+
     }
 }
