@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 public class NotFindException extends Throwable implements MyExceptionInterface {
 
     private String message;
-    private final HttpStatus httpStatus = HttpStatus.valueOf(400);
+    private final HttpStatus httpStatus = HttpStatus.valueOf(404);
     @Override
     public String getMessageByExc(){
         return message;

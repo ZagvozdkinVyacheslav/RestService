@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 @Setter
 @AllArgsConstructor
 public class UniqueException extends Throwable implements MyExceptionInterface{
-    private final String message = "Пользователь с введенными вами данными уже существует";
+    private String message;
     private final HttpStatus httpStatus = HttpStatus.valueOf(500);
     @Override
     public String getMessageByExc(){

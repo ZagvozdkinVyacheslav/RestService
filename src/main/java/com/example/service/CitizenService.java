@@ -42,7 +42,7 @@ public class CitizenService {
                 .build();
         if(citizensRepo.findListOfCitizensByOptionalParams(citizen.getLast_name(),citizen.getFirst_name(),
                 citizen.getMiddle_name(), citizen.getBirth_date()).size() >= 1){
-            throw new UniqueException();
+            throw new UniqueException("Пользователь с введенными вами данными уже существует");
         }
         return citizensRepo.save(citizen);
     }
@@ -62,34 +62,45 @@ public class CitizenService {
             throw new NotFindException("По данному id гражданин не найден.");
         }
     }
-    public void updateCitizenByIdAndParams(Long id,Citizen citizen){
-        Citizen citizenForUpdate = citizensRepo.findById(id).get();
+    @SneakyThrows
+    public void updateCitizenByIdAndParams(Long id, Citizen citizen){
+        try {
+            Citizen citizenForUpdate = citizensRepo.findById(id).get();
+
+
         Field[] fields = citizen.getClass().getDeclaredFields();
         ArrayList<Field> utilList = new ArrayList<Field>(Arrays.asList(fields));
         List<StringBuilder> sbFields = new ArrayList<>();
-        List<String> fieldsOfCitizen = new ArrayList<>();
         for (int i = 1; i < utilList.size();i++) {
             sbFields.add(new StringBuilder(String.valueOf(utilList.get(i).getName())));
             Character firstChar = sbFields.get(i - 1).charAt(0);
             firstChar = (char) (firstChar & 0x5f);
             sbFields.get(i - 1).setCharAt(0,firstChar);
         }
-        try {
-            for (int i = 0; i < sbFields.size(); i++) {
-                //для гета сделать тоже самое но для ситизена
-                Method met = citizen.getClass().getMethod("set"+sbFields.get(0), String.class);
-                met.setAccessible(true);
-                met.invoke(citizenForUpdate,"df");
+        for (int i = 0; i < sbFields.size(); i++) {
+            Method metGet = citizen.getClass().getMethod("get"+sbFields.get(i));
+            metGet.setAccessible(true);
+            if(metGet.invoke(citizen) != null){
+                Method metSet;
+                if(i <= 5)//после 5 метода наш методы получают integer
+                {
+                    metSet = citizen.getClass().getMethod("set"+sbFields.get(i), String.class);
+                }
+                else {
+                    metSet = citizen.getClass().getMethod("set"+sbFields.get(i), Integer.class);
+                }
+                metSet.setAccessible(true);
+                metSet.invoke(citizenForUpdate,metGet.invoke(citizen));
             }
-
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
-
-
+        if(citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLast_name(), citizenForUpdate.getFirst_name(),
+                citizenForUpdate.getMiddle_name(),citizenForUpdate.getBirth_date()).size() > 1)
+            throw new UniqueException("По введенным данным уже существует гражданин");
+        else{
+            citizensRepo.save(citizenForUpdate);
+        }
+        }catch (NoSuchElementException e){
+            throw new NotFindException("По данным параметрам гражданин не найден.");
+        }
     }
 }

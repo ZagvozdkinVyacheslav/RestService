@@ -103,9 +103,7 @@ public class MainController {
     public ResponseEntity<Object> modificationDataCitizen(@PathVariable(value = "id") Long id,
                                                            @RequestBody @Validated({Marker.onUpdate.class}) @Valid Citizen citizen) {
         citizenService.updateCitizenByIdAndParams(id,citizen);
-        return new ResponseEntity<>("sf",HttpStatus.BAD_REQUEST);
-
-
+        return new ResponseEntity<>(id,HttpStatus.valueOf(200));
     }
     /*@Operation(summary = "Delete citizen by id", tags = "citizen")
     @ApiResponses(value = {
