@@ -4,6 +4,7 @@ import com.example.database.entity.Citizen;
 import com.example.interfaces.Marker;
 import com.example.service.CitizenService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
-@Tag(name = "Citizen", description = "The Citizen API")
+@Tag(name = "Citizen controller", description = "The Citizen API")
 @Validated
 @RestController
 @RequestMapping(value = "/")
@@ -32,7 +33,10 @@ public class MainController {
     @Autowired
     Validator validator;
 
-    @Operation(summary = "Gets all citizens", tags = "citizen")
+    @Operation(
+            summary = "get list of citizens",
+            description = "Makes it possible to get a list of citizens by optional parameters"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -42,51 +46,62 @@ public class MainController {
                                     mediaType = "application/json",
                                     array = @ArraySchema(schema = @Schema(implementation = Citizen.class)))
                     }),
-            @ApiResponse(responseCode = "404",description = "The citizen was not found according to the specified parameters"),
+            @ApiResponse(responseCode = "404",description = "Citizen wasn't find by this params"),
             @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
     })
     @GetMapping(path = "/citizens")
-    public ResponseEntity<List> getCitizensByParams(@RequestBody @Validated(value = {Marker.onGetting.class}) @Valid Citizen citizen) {
+    public ResponseEntity<List> getCitizensByParams(@Parameter(description = "pojo object of Citizen with params")
+                                                        @RequestBody @Validated(value = {Marker.onGetting.class})
+                                                        @Valid Citizen citizen) {
         var listOfCitizens = citizenService.getAllCitizensByParams(citizen);
         return new ResponseEntity<>(listOfCitizens, HttpStatusCode.valueOf(200));
     }
-    /*@Operation(summary = "Get one citizen", tags = "citizen")
+    @Operation(
+            summary = "get citizen by id",
+            description = "Makes it possible to get citizen by id", tags = "citizen"
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Found user by id(@PathVariable)",
+                    description = "Found the users by id",
                     content = {
                             @Content(
-                                    mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = Citizen.class)))
-                    }),
-            @ApiResponse(responseCode = "404",description = "The citizen was not found according to the id"),
-            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation"),
-    })*/
-    @GetMapping(path = "/citizens/{id}")//нет работы через html
-    public ResponseEntity<Citizen> getCitizen(@PathVariable(value = "id") Long id) {
+                                    mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(responseCode = "404",description = "Citizen wasn't find by this id"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
+    @GetMapping(path = "/citizens/{id}")
+    public ResponseEntity<Citizen> getCitizen(@Parameter(description = "path variable id of Citizen")@PathVariable(value = "id") Long id) {
         return new ResponseEntity<>(citizenService.getOneCitizen(id),HttpStatusCode.valueOf(200));
     }
-    /*@Operation(summary = "Create new citizen", tags = "citizen")
+    @Operation(summary = "Create new citizen",
+            description = "Makes it possible to create citizen by citizens params",
+            tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
                     description = "Create new citizen by params",
                     content = {
-                            @Content(
-                                    mediaType = "application/json")
-                    }),
-            @ApiResponse(responseCode = "400",description = "Required fields are not filled in + fields output"),
-            @ApiResponse(responseCode = "400",description = "Such a user was created earlier")
-    })*/
+                    @Content(
+                            mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(responseCode = "422",description = "Error reading the request body"),
+            @ApiResponse(responseCode = "400",description = "Error with validation params"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
 
     @PostMapping(path = "/citizens")
-    public ResponseEntity<Object> addNewCitizen(@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
+    public ResponseEntity<Object> addNewCitizen(@Parameter(description = "pojo object of Citizen with params")@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
 
         return new ResponseEntity<>(citizenService.saveCitizen(citizen).getId(), HttpStatus.CREATED);
 
     }
-    /*@Operation(summary = "Update one citizen", tags = "citizen")
+    @Operation(summary = "Update one citizen",
+            description = "Makes it possible to update citizen by citizens params",
+            tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -95,17 +110,22 @@ public class MainController {
                             @Content(
                                     mediaType = "application/json")
                     }),
-            @ApiResponse(responseCode = "400",description = "Data entry format error + fields output"),
-            @ApiResponse(responseCode = "404",description = "There is no such citizen"),
-            @ApiResponse(responseCode = "500",description = "After changing the parameters, 2 identical citizens appear in the database"),
-    })*/
+            @ApiResponse(responseCode = "422",description = "Error reading the request body"),
+            @ApiResponse(responseCode = "400",description = "Error with validation params"),
+            @ApiResponse(responseCode = "404",description = "The error of the absence of a mutable Citizen"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
     @PutMapping(path = "/citizens/{id}")
-    public ResponseEntity<Object> modificationDataCitizen(@PathVariable(value = "id") Long id,
-                                                           @RequestBody @Validated({Marker.onUpdate.class}) @Valid Citizen citizen) {
+    public ResponseEntity<Object> modificationDataCitizen(@Parameter(description = "path variable id of Citizen")
+                                                              @PathVariable(value = "id") Long id,
+                                                          @Parameter(description = "pojo object of Citizen with params")
+                                                          @RequestBody @Validated({Marker.onUpdate.class}) @Valid Citizen citizen) {
         citizenService.updateCitizenByIdAndParams(id,citizen);
         return new ResponseEntity<>(id,HttpStatus.valueOf(200));
     }
-    /*@Operation(summary = "Delete citizen by id", tags = "citizen")
+    @Operation(summary = "Delete citizen by id",
+            description = "Makes it possible to delete citizen by id",
+            tags = "citizen")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
@@ -114,10 +134,13 @@ public class MainController {
                             @Content(
                                     mediaType = "application/json"
                                     )
-                    })
-    })*/
+                    }),
+            @ApiResponse(responseCode = "404",description = "Citizen wasn't find by this id"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
    @DeleteMapping (path = "/citizens/{id}")
-    public ResponseEntity<String> deleteCitizen(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<String> deleteCitizen(@Parameter(description = "path variable id of Citizen")
+                                                   @PathVariable(value = "id") Long id) {
         citizenService.deleteCitizenById(id);
        return new ResponseEntity<>("",HttpStatus.valueOf(204));
     }
