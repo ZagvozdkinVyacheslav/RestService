@@ -1,17 +1,12 @@
 package com.example.database.repository;
 
-import com.example.database.dto.Citizen;
-import jakarta.transaction.Transactional;
+import com.example.database.entity.Citizen;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,36 +27,5 @@ public interface CitizensRepo extends JpaRepository<Citizen, Long> {
                                                      @Param("birth_date")String birthDate
     );
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.last_name = ?2 where c.id = ?1")
-    int updateCitizenLastNameById(Long id,String lastName);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.first_name = ?2 where c.id = ?1")
-    int updateCitizenFirstNameById(Long id,String firstName);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.middle_name = ?2 where c.id = ?1")
-    int updateCitizenMiddleNameById(Long id,String middleName);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.birth_date = ?2 where c.id = ?1")
-    int updateCitizenBirthDateById(Long id,String birthDate);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.phone = ?2 where c.id = ?1")
-    int updateCitizenPhoneById(Long id,String phone);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.extra_phone = ?2 where c.id = ?1")
-    int updateCitizenExtraPhoneById(Long id,String extraPhone);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.dul_serie = ?2 where c.id = ?1")
-    int updateCitizenDulSerieById(Long id,Integer dulSerie);
-    @Modifying
-    @Transactional
-    @Query("UPDATE Citizen c SET  c.dul_number = ?2 where c.id = ?1")
-    int updateCitizenDulNumberById(Long id,Integer dulNumber);
+
 }

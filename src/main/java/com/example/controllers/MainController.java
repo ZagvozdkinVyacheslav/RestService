@@ -1,183 +1,147 @@
 package com.example.controllers;
 
-import com.example.database.dto.Citizen;
+import com.example.database.entity.Citizen;
+import com.example.interfaces.Marker;
 import com.example.service.CitizenService;
-import jakarta.persistence.NonUniqueResultException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.thymeleaf.exceptions.TemplateInputException;
 
-import java.time.DateTimeException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+@Tag(name = "Citizen controller", description = "The Citizen API")
+@Validated
 @RestController
 @RequestMapping(value = "/")
 public class MainController {
-
     @Autowired
     CitizenService citizenService;
-    @GetMapping()
-    public ModelAndView startPage() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("index");
-        modelAndView.setStatus(HttpStatusCode.valueOf(200));
-        return modelAndView;
-    }
+    @Autowired
+    Validator validator;
+
+    @Operation(
+            summary = "get list of citizens",
+            description = "Makes it possible to get a list of citizens by optional parameters"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found the users by Optional params",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = Citizen.class)))
+                    }),
+            @ApiResponse(responseCode = "404",description = "Citizen wasn't find by this params"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
     @GetMapping(path = "/citizens")
-    public ModelAndView getCitizensByParams(@RequestParam String lastNameBtn,
-                                            @RequestParam String firstNameBtn,
-                                            @RequestParam String middleNameBtn,
-                                            @RequestParam String birthDateBtn) {
-        if(lastNameBtn.equals(""))lastNameBtn = null;
-        if(firstNameBtn.equals(""))firstNameBtn = null;
-        if(middleNameBtn.equals(""))middleNameBtn = null;
-        if(birthDateBtn.equals(""))birthDateBtn = null;
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            List<Citizen> citizenList = citizenService.findListOfCitizensByOptionalParams(lastNameBtn,firstNameBtn,middleNameBtn,birthDateBtn);
-            modelAndView.setViewName("all_citizens");
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
-            modelAndView.addObject("citizenList", citizenList);
-        }catch (NoSuchElementException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }
-        catch (Exception e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }
+    public ResponseEntity<List> getCitizensByParams(@Parameter(description = "pojo object of Citizen with params")
+                                                        @RequestBody @Validated(value = {Marker.onGetting.class})
+                                                        @Valid Citizen citizen) {
+        var listOfCitizens = citizenService.getAllCitizensByParams(citizen);
+        return new ResponseEntity<>(listOfCitizens, HttpStatusCode.valueOf(200));
+    }
+    @Operation(
+            summary = "get citizen by id",
+            description = "Makes it possible to get citizen by id", tags = "citizen"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Found the users by id",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(responseCode = "404",description = "Citizen wasn't find by this id"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
+    @GetMapping(path = "/citizens/{id}")
+    public ResponseEntity<Citizen> getCitizen(@Parameter(description = "path variable id of Citizen")@PathVariable(value = "id") Long id) {
+        return new ResponseEntity<>(citizenService.getOneCitizen(id),HttpStatusCode.valueOf(200));
+    }
+    @Operation(summary = "Create new citizen",
+            description = "Makes it possible to create citizen by citizens params",
+            tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Create new citizen by params",
+                    content = {
+                    @Content(
+                            mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(responseCode = "422",description = "Error reading the request body"),
+            @ApiResponse(responseCode = "400",description = "Error with validation params"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
 
-        return modelAndView;
-    }
-    @GetMapping(path = "/citizens/{id}")//нет работы через html
-    public ModelAndView getCitizen(@PathVariable(value = "id") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            Citizen citizen = citizenService.findCitizenById(id);
-            modelAndView.setViewName("one_citizen");
-            List<Citizen> citizenList = new ArrayList<>();
-            citizenList.add(citizen);
-            modelAndView.addObject("citizenList", citizenList);
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
-        }catch (NoSuchElementException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", "Такой элемент не найден!");
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }
-        catch (Exception e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }
-        return modelAndView;
-    }
     @PostMapping(path = "/citizens")
-    public ModelAndView addNewCitizen(@RequestParam(required = false,defaultValue = "") String last_name,
-                              @RequestParam(required = false,defaultValue = "") String first_name,
-                              @RequestParam(required = false,defaultValue = "") String middle_name,
-                              @RequestParam(required = false,defaultValue = "") String birth_date,
-                              @RequestParam(required = false,defaultValue = "") String phone,
-                              @RequestParam(required = false,defaultValue = "") String extra_phone,
-                              @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
-                              @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
-        ModelAndView modelAndView = new ModelAndView();
-        try{
-            citizenService.addCitizenInRepository(last_name,first_name, middle_name, birth_date,
-                    phone, extra_phone, dul_serie,dul_number);
-            Long id = citizenService.findAllCitizensByParams(last_name,first_name,middle_name,birth_date).get(0).getId();
-            modelAndView.setViewName("success_request");
-            modelAndView.addObject("citizen_id", "id гражданина = " + id.toString());
-            modelAndView.setStatus(HttpStatusCode.valueOf(201));
-        }catch (NullPointerException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }catch (NumberFormatException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }
-        catch (NonUniqueResultException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }
-        catch (DateTimeException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }
+    public ResponseEntity<Object> addNewCitizen(@Parameter(description = "pojo object of Citizen with params")@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
 
-        return modelAndView;
+        return new ResponseEntity<>(citizenService.saveCitizen(citizen).getId(), HttpStatus.CREATED);
+
     }
+    @Operation(summary = "Update one citizen",
+            description = "Makes it possible to update citizen by citizens params",
+            tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Update citizen by id and some params",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json")
+                    }),
+            @ApiResponse(responseCode = "422",description = "Error reading the request body"),
+            @ApiResponse(responseCode = "400",description = "Error with validation params"),
+            @ApiResponse(responseCode = "404",description = "The error of the absence of a mutable Citizen"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
     @PutMapping(path = "/citizens/{id}")
-    public ModelAndView modificationDataCitizen(@PathVariable(value = "id") Long id,
-            @RequestParam(required = false,defaultValue = "") String last_name,
-                                        @RequestParam(required = false,defaultValue = "") String first_name,
-                                        @RequestParam(required = false,defaultValue = "") String middle_name,
-                                        @RequestParam(required = false,defaultValue = "") String birth_date,
-                                        @RequestParam(required = false,defaultValue = "") String phone,
-                                        @RequestParam(required = false,defaultValue = "") String extra_phone,
-                                        @RequestParam(required = false,defaultValue = "1") Integer dul_serie,
-                                        @RequestParam(required = false,defaultValue = "1") Integer dul_number) {
-        ModelAndView modelAndView = new ModelAndView();
-        try{
-            citizenService.modificateFields(id,last_name,first_name,middle_name,birth_date,phone,extra_phone,dul_serie,dul_number);
-            modelAndView.setViewName("success_request");
-            modelAndView.addObject("citizen_id", "id гражданина = " + id.toString());
-            modelAndView.setStatus(HttpStatusCode.valueOf(200));
-        }catch (NoSuchElementException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }catch (DateTimeException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }catch (NonUniqueResultException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }catch (NumberFormatException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }catch (NoSuchFieldException e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", e.getMessage());
-            modelAndView.setStatus(HttpStatusCode.valueOf(400));
-        }
-
-
-
-
-
-        return modelAndView;
+    public ResponseEntity<Object> modificationDataCitizen(@Parameter(description = "path variable id of Citizen")
+                                                              @PathVariable(value = "id") Long id,
+                                                          @Parameter(description = "pojo object of Citizen with params")
+                                                          @RequestBody @Validated({Marker.onUpdate.class}) @Valid Citizen citizen) {
+        citizenService.updateCitizenByIdAndParams(id,citizen);
+        return new ResponseEntity<>(id,HttpStatus.valueOf(200));
     }
-    @DeleteMapping (path = "/citizens/{id}")
-    public ModelAndView deleteCitizen(@PathVariable(value = "id") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            citizenService.deleteCitizenById(id);
-            modelAndView.setViewName("index");
-            modelAndView.setStatus(HttpStatusCode.valueOf(204));
-        }catch (TemplateInputException e){//если такого нет
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", "В базе данных нет гражданина с таким id");
-            modelAndView.setStatus(HttpStatusCode.valueOf(404));
-        }catch (Exception e){
-            modelAndView.setViewName("some_exception");
-            modelAndView.addObject("someMessage", "Произошла ошибка вызванная работой сервера");
-            modelAndView.setStatus(HttpStatusCode.valueOf(500));
-        }
-
-        return modelAndView;
-
+    @Operation(summary = "Delete citizen by id",
+            description = "Makes it possible to delete citizen by id",
+            tags = "citizen")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Delete citizen by id",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json"
+                                    )
+                    }),
+            @ApiResponse(responseCode = "404",description = "Citizen wasn't find by this id"),
+            @ApiResponse(responseCode = "500",description = "An error occurred caused by the server operation")
+    })
+   @DeleteMapping (path = "/citizens/{id}")
+    public ResponseEntity<String> deleteCitizen(@Parameter(description = "path variable id of Citizen")
+                                                   @PathVariable(value = "id") Long id) {
+        citizenService.deleteCitizenById(id);
+       return new ResponseEntity<>("",HttpStatus.valueOf(204));
     }
 }
