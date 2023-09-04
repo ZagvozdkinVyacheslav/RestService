@@ -95,9 +95,7 @@ public class MainController {
 
     @PostMapping(path = "/citizens")
     public ResponseEntity<Object> addNewCitizen(@Parameter(description = "pojo object of Citizen with params")@RequestBody @Validated(value = {Marker.onCreate.class}) @Valid Citizen citizen) {
-
         return new ResponseEntity<>(citizenService.saveCitizen(citizen).getId(), HttpStatus.CREATED);
-
     }
     @Operation(summary = "Update one citizen",
             description = "Makes it possible to update citizen by citizens params",
