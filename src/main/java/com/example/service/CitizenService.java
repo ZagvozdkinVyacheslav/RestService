@@ -8,16 +8,11 @@ import com.example.exception.UniqueException;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @NoArgsConstructor
@@ -29,7 +24,6 @@ public class CitizenService {
 
     @SneakyThrows
     public Citizen saveCitizen(Citizen citizenIncome){
-
         Citizen citizen = Citizen.builder()
                 .lastName(citizenIncome.getLastName())
                 .firstName(citizenIncome.getFirstName())
@@ -48,6 +42,7 @@ public class CitizenService {
     }
     @SneakyThrows
     public List getAllCitizensByParams(Citizen citizen){
+
         var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLastName(), citizen.getFirstName(),
                 citizen.getMiddleName(), citizen.getBirthDate());
         if(citizenList.size() == 0)throw new NotFindException("По данным параметрам гражданин не найден.");

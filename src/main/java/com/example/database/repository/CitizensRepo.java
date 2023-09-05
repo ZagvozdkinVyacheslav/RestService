@@ -13,9 +13,6 @@ import java.util.Optional;
 @Repository
 public interface CitizensRepo extends JpaRepository<Citizen, Long> {
     Optional<Citizen> findById(Long aLong);
-    @Query("FROM Citizen WHERE lastName = ?1 AND firstName = ?2 AND middleName = ?3 AND birthDate = ?4")
-    List<Citizen>listCitizensByParam(String lastName, String firstName, String middleName, String birthDate);
-
     @Query(value = "SELECT c FROM Citizen c WHERE(:lastName is null or c.lastName = :lastName) " +
             "AND (:firstName is null or c.firstName = :firstName) " +
             "AND (:middleName is null or c.middleName = :middleName) " +
@@ -26,6 +23,8 @@ public interface CitizensRepo extends JpaRepository<Citizen, Long> {
                                                      @Param("middleName")String middleName,
                                                      @Param("birthDate")String birthDate
     );
+
+    
 
 
 }
