@@ -28,13 +28,14 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleValidationConstraintViolationException(ConstraintViolationException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler({UniqueException.class, NotFindException.class})//this classes implements MyExceptionInterface
-    public ResponseEntity<Object> handleValidationExceptions(MyExceptionInterface ex) {
-        return new ResponseEntity<>(ex.getMessageByExc(),ex.getHttpStatusByMyExc());
-    }
     @ExceptionHandler({HttpMessageNotReadableException.class})//Ошибка чтения тела запроса - 422 и сообщение об ошибке;
     public ResponseEntity<Object> handleValidationExceptions(HttpMessageNotReadableException ex) {
         return new ResponseEntity<>("Произошла ошибка чтения тела запроса.", HttpStatus.valueOf(422));
+    }
+    //custom exceptions
+    @ExceptionHandler({UniqueException.class, NotFindException.class})//this classes implements MyExceptionInterface
+    public ResponseEntity<Object> handleValidationExceptions(MyExceptionInterface ex) {
+        return new ResponseEntity<>(ex.getMessageByExc(),ex.getHttpStatusByMyExc());
     }
     @ExceptionHandler({Exception.class})//Ошибка сервера - 500 и сообщение об ошибке;
     public ResponseEntity<Object> handleValidationAllException(Exception ex) {

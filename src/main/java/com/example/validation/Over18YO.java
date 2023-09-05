@@ -5,7 +5,7 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
-@Target( { ElementType.FIELD, ElementType.PARAMETER,ElementType.METHOD})
+@Target( { ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = Custom18YOValidator.class)
