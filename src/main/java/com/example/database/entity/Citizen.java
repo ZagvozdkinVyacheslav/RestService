@@ -20,7 +20,11 @@ import lombok.*;
 public class Citizen {
     @Schema(description = "Primary key in data base",accessMode = Schema.AccessMode.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    //Попытка в оптимизацию бд для маленького кол во запросов
+    //SEQUENCE выбран из за возмож пакетной вставки и тк только один клиент работает с бд
+    @SequenceGenerator(name = "CitizenGen",
+             initialValue = 1, allocationSize = 20)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "CitizenGen")
     private Long id;
     @Schema(description = "Citizen surname(obligatory)", example = "Ivanov")
     @NotNull(message = "Citizen must have surname", groups = Marker.onCreate.class)
