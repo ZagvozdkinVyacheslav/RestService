@@ -31,25 +31,25 @@ public class CitizenService {
     public Citizen saveCitizen(Citizen citizenIncome){
 
         Citizen citizen = Citizen.builder()
-                .last_name(citizenIncome.getLast_name())
-                .first_name(citizenIncome.getFirst_name())
-                .middle_name(citizenIncome.getMiddle_name())
-                .birth_date(citizenIncome.getBirth_date())
+                .lastName(citizenIncome.getLastName())
+                .firstName(citizenIncome.getFirstName())
+                .middleName(citizenIncome.getMiddleName())
+                .birthDate(citizenIncome.getBirthDate())
                 .phone(citizenIncome.getPhone())
-                .extra_phone(citizenIncome.getExtra_phone())
-                .dul_serie(citizenIncome.getDul_serie())
-                .dul_number(citizenIncome.getDul_number())
+                .extraPhone(citizenIncome.getExtraPhone())
+                .dulSeries(citizenIncome.getDulSeries())
+                .dulNumber(citizenIncome.getDulNumber())
                 .build();
-        if(citizensRepo.findListOfCitizensByOptionalParams(citizen.getLast_name(),citizen.getFirst_name(),
-                citizen.getMiddle_name(), citizen.getBirth_date()).size() >= 1){
+        if(citizensRepo.findListOfCitizensByOptionalParams(citizen.getLastName(),citizen.getFirstName(),
+                citizen.getMiddleName(), citizen.getBirthDate()).size() >= 1){
             throw new UniqueException("Пользователь с введенными вами данными уже существует");
         }
         return citizensRepo.save(citizen);
     }
     @SneakyThrows
     public List getAllCitizensByParams(Citizen citizen){
-        var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLast_name(), citizen.getFirst_name(),
-                citizen.getMiddle_name(), citizen.getBirth_date());
+        var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLastName(), citizen.getFirstName(),
+                citizen.getMiddleName(), citizen.getBirthDate());
         if(citizenList.size() == 0)throw new NotFindException("По данным параметрам гражданин не найден.");
         return citizenList;
     }
@@ -91,8 +91,8 @@ public class CitizenService {
                     metSet.invoke(citizenForUpdate,metGet.invoke(citizen));
                 }
             }
-            if(citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLast_name(), citizenForUpdate.getFirst_name(),
-                    citizenForUpdate.getMiddle_name(),citizenForUpdate.getBirth_date()).size() > 1)
+            if(citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLastName(), citizenForUpdate.getFirstName(),
+                    citizenForUpdate.getMiddleName(),citizenForUpdate.getBirthDate()).size() > 1)
                 throw new UniqueException("По введенным данным уже существует гражданин");
             else{
                 citizensRepo.save(citizenForUpdate);
