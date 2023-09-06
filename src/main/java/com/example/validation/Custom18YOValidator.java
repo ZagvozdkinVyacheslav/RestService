@@ -18,6 +18,7 @@ public class Custom18YOValidator implements ConstraintValidator<Over18YO,String>
 
     @Override
     public boolean isValid(String contactField, ConstraintValidatorContext constraintValidatorContext) {
+        if(contactField == null)return true;
         LocalDate currentDate =  LocalDate.now();
         currentDate = currentDate.minusDays(Integer.parseInt(contactField.substring(0,2)));
         currentDate = currentDate.minusMonths(Integer.parseInt(contactField.substring(3,5)));

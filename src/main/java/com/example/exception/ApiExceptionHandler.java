@@ -37,8 +37,8 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleValidationExceptions(MyExceptionInterface ex) {
         return new ResponseEntity<>(ex.getMessageByExc(),ex.getHttpStatusByMyExc());
     }
-    @ExceptionHandler({Exception.class})//Ошибка сервера - 500 и сообщение об ошибке;
+    /*@ExceptionHandler({Exception.class})//Ошибка сервера - 500 и сообщение об ошибке;
     public ResponseEntity<Object> handleValidationAllException(Exception ex) {
         return new ResponseEntity<>("Произошла ошибка работы сервера", HttpStatus.valueOf(500));
-    }
+    }*/
 }
