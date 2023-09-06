@@ -8,7 +8,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +31,6 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleValidationExceptions(HttpMessageNotReadableException ex) {
         return new ResponseEntity<>("Произошла ошибка чтения тела запроса.", HttpStatus.valueOf(422));
     }
-    //custom exceptions
     @ExceptionHandler({NotFindException.class})
     public ResponseEntity<Object> handleValidationExceptions(NotFindException ex) {
         return new ResponseEntity<>(ex.getMessage(),ex.getHttpStatus());
