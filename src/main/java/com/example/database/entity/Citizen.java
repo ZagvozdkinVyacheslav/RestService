@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.Date;
+
 
 @Getter
 @Setter
@@ -61,17 +63,15 @@ public class Citizen {
     @Schema(description = "Citizen passport series(obligatory)",
             example = "1111",minimum = "1000",maximum = "9999")
     @NotNull(message = "Citizen must have dul serie", groups = Marker.onCreate.class)
-    @Min(value = 1000, message = "dul serie must have 4 digits")
-    @Max(value = 9999, message = "dul serie must have 4 digits")
+    @Pattern(regexp = "(\\d{4})", message = "Invalid passport number")
     @Column(name = "dul_series")
-    private Integer dulSeries;
+    private String dulSeries;
     @Schema(description = "Citizen passport number(obligatory)",
             example = "111111",minimum = "100000",maximum = "999999")
     @NotNull(message = "Citizen must have dul series", groups = Marker.onCreate.class)
-    @Min(value = 100000, message = "dul number must have 6 digits")
-    @Max(value = 999999, message = "dul number must have 6 digits")
+    @Pattern(regexp = "(\\d{6})", message = "Invalid passport number")
     @Column(name = "dul_number")
-    private Integer dulNumber;
+    private String dulNumber;
 
     @Override
     public String toString() {

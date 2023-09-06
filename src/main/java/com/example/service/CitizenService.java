@@ -42,7 +42,6 @@ public class CitizenService {
     }
     @SneakyThrows
     public List getAllCitizensByParams(Citizen citizen){
-
         var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLastName(), citizen.getFirstName(),
                 citizen.getMiddleName(), citizen.getBirthDate());
         if(citizenList.size() == 0)throw new NotFindException("По данным параметрам гражданин не найден.");
