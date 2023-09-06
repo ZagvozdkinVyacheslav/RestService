@@ -9,16 +9,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UniqueException extends Throwable implements MyExceptionInterface{
+public class UniqueException extends Exception{
     private String message;
     private final HttpStatus httpStatus = HttpStatus.valueOf(500);
-    @Override
-    public String getMessageByExc(){
-        return message;
-    }
-
-    @Override
-    public HttpStatus getHttpStatusByMyExc() {
-        return httpStatus;
-    }
 }

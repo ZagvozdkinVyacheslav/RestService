@@ -22,8 +22,8 @@ public class CitizenService {
 
 
 
-    @SneakyThrows
-    public Citizen saveCitizen(Citizen citizenIncome){
+
+    public Citizen saveCitizen(Citizen citizenIncome) throws UniqueException {
         Citizen citizen = Citizen.builder()
                 .lastName(citizenIncome.getLastName())
                 .firstName(citizenIncome.getFirstName())
@@ -40,15 +40,15 @@ public class CitizenService {
         }
         return citizensRepo.save(citizen);
     }
-    @SneakyThrows
-    public List getAllCitizensByParams(Citizen citizen){
+
+    public List getAllCitizensByParams(Citizen citizen) throws NotFindException {
         var citizenList = citizensRepo.findListOfCitizensByOptionalParams(citizen.getLastName(), citizen.getFirstName(),
                 citizen.getMiddleName(), citizen.getBirthDate());
         if(citizenList.size() == 0)throw new NotFindException("По данным параметрам гражданин не найден.");
         return citizenList;
     }
-    @SneakyThrows
-    public Citizen getOneCitizen(Long id){
+
+    public Citizen getOneCitizen(Long id) throws NotFindException {
         try {
             Citizen citizen = citizensRepo.findById(id).get();
             return citizen;
@@ -57,7 +57,7 @@ public class CitizenService {
         }
     }
     @SneakyThrows
-    public void updateCitizenByIdAndParams(Long id, Citizen citizen){
+    public void updateCitizenByIdAndParams(Long id, Citizen citizen) throws UniqueException, NotFindException {
         try {
             Citizen citizenForUpdate = citizensRepo.findById(id).get();
             Field[] fields = citizen.getClass().getDeclaredFields();
@@ -95,8 +95,8 @@ public class CitizenService {
             throw new NotFindException("По данным параметрам гражданин не найден.");
         }
     }
-    @SneakyThrows
-    public void deleteCitizenById(Long id){
+
+    public void deleteCitizenById(Long id) throws NotFindException {
         try{
             Citizen citizen = citizensRepo.findById(id).get();
             citizensRepo.delete(citizen);

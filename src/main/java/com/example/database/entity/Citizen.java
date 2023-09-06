@@ -16,6 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Schema(description = "Citizen entity")
 @Entity
 @Table(name = "citizens")
@@ -73,18 +74,5 @@ public class Citizen {
     @Column(name = "dul_number")
     private String dulNumber;
 
-    @Override
-    public String toString() {
-        return "Citizen{" +
-                "id=" + id +
-                ", lastName='" + lastName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", birthNate='" + birthDate + '\'' +
-                ", phone='" + phone + '\'' +
-                ", extraPhone='" + extraPhone + '\'' +
-                ", dulSeries=" + dulSeries +
-                ", dulNumber=" + dulNumber +
-                '}';
-    }
+
 }
