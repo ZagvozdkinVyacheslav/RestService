@@ -8,7 +8,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +31,16 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleValidationExceptions(HttpMessageNotReadableException ex) {
         return new ResponseEntity<>("Произошла ошибка чтения тела запроса.", HttpStatus.valueOf(422));
     }
-    //custom exceptions
-    @ExceptionHandler({UniqueException.class, NotFindException.class})//this classes implements MyExceptionInterface
-    public ResponseEntity<Object> handleValidationExceptions(MyExceptionInterface ex) {
-        return new ResponseEntity<>(ex.getMessageByExc(),ex.getHttpStatusByMyExc());
+    @ExceptionHandler({NotFindException.class})
+    public ResponseEntity<Object> handleValidationExceptions(NotFindException ex) {
+        return new ResponseEntity<>(ex.getMessage(),ex.getHttpStatus());
     }
-    /*@ExceptionHandler({Exception.class})//Ошибка сервера - 500 и сообщение об ошибке;
+    @ExceptionHandler({UniqueException.class})
+    public ResponseEntity<Object> handleValidationExceptions(UniqueException ex) {
+        return new ResponseEntity<>(ex.getMessage(),ex.getHttpStatus());
+    }
+    @ExceptionHandler({Exception.class})//Ошибка сервера - 500 и сообщение об ошибке;
     public ResponseEntity<Object> handleValidationAllException(Exception ex) {
         return new ResponseEntity<>("Произошла ошибка работы сервера", HttpStatus.valueOf(500));
-    }*/
+    }
 }

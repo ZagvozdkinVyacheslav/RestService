@@ -2,10 +2,7 @@ package com.example.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
-
 import java.time.LocalDate;
-
 
 public class Custom18YONotNullValidator implements ConstraintValidator<Over18YONotNull,String> {
     private Over18YONotNull over18YONotNull;
