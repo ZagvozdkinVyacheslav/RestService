@@ -78,8 +78,9 @@ public class CitizenService {
                     metSet.invoke(citizenForUpdate,metGet.invoke(citizen));//меняем знач в гражданине, который найден по id
                 }
             }
-            if(citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLastName(), citizenForUpdate.getFirstName(),
-                    citizenForUpdate.getMiddleName(),citizenForUpdate.getBirthDate()).size() > 1)
+            var citizensByParam = citizensRepo.findListOfCitizensByOptionalParams(citizenForUpdate.getLastName(), citizenForUpdate.getFirstName(),
+                    citizenForUpdate.getMiddleName(),citizenForUpdate.getBirthDate());
+            if(citizensByParam.size() > 1 || (citizensByParam.size() == 1 && citizensByParam.get(0).getId() != id))
                 throw new UniqueException("По введенным данным уже существует гражданин");
             else
                 citizensRepo.save(citizenForUpdate);
